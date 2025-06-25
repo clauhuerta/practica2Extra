@@ -1,59 +1,78 @@
 package org.vaadin.example;
 
-import com.vaadin.flow.component.Key;
+
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 
-/**
- * A sample Vaadin view class.
- * <p>
- * To implement a Vaadin view just extend any Vaadin component and use @Route
- * annotation to announce it in a URL as a Spring managed bean.
- * <p>
- * A new instance of this class is created for every new user and every browser
- * tab/window.
- * <p>
- * The main view contains a text field for getting the user name and a button
- * that shows a greeting message in a notification.
- */
-@Route
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+@Route("")
 public class MainView extends VerticalLayout {
 
-    /**
-     * Construct a new Vaadin view.
-     * <p>
-     * Build the initial UI state for the user accessing the application.
-     *
-     * @param service
-     *            The message service. Automatically injected Spring managed bean.
-     */
-    public MainView(GreetService service) {
+    private final TurismoClient turismoClient;
+    private final ComunidadClient comunidadClient;
 
-        // Use TextField for standard text input
-        TextField textField = new TextField("Your name");
-        textField.addClassName("bordered");
+    private final Grid<TurismoComunidad> gridGeneral = new Grid<>(TurismoComunidad.class);
+    private final DatePicker datePicker = new DatePicker("Filtrar por mes");
+    private final Button btnNuevo = new Button("Nuevo");
 
-        // Button click listeners can be defined as lambda expressions
-        Button button = new Button("Say hello", e -> {
-            add(new Paragraph(service.greet(textField.getValue())));
+    private final Grid<TurismoComunidad> gridAgrupado = new Grid<>(TurismoComunidad.class);
+    private final Select<String> selectComunidad = new Select<>();
+
+    public MainView(TurismoClient tc, ComunidadClient cc) {
+        this.turismoClient = tc;
+        this.comunidadClient = cc;
+
+        Tab tab1 = new Tab("Datos Generales");
+        Tab tab2 = new Tab("Por Comunidad");
+        Tabs tabs = new Tabs(tab1, tab2);
+        Div page1 = new Div(buildGeneralLayout());
+        Div page2 = new Div(buildAgrupadoLayout());
+        page2.setVisible(false);
+
+        tabs.addSelectedChangeListener(e -> {
+            page1.setVisible(e.getSelectedTab()==tab1);
+            page2.setVisible(e.getSelectedTab()==tab2);
         });
 
-        // Theme variants give you predefined extra styles for components.
-        // Example: Primary button has a more prominent look.
-        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        add(tabs, page1, page2);
+        setSizeFull();
+        refreshGeneral();
+        refreshSelect();
+    }
 
-        // You can specify keyboard shortcuts for buttons.
-        // Example: Pressing enter in this view clicks the Button.
-        button.addClickShortcut(Key.ENTER);
+    private VerticalLayout buildGeneralLayout() {
+        VerticalLayout layout = new VerticalLayout(datePicker, btnNuevo, gridGeneral);
+        // configuración idéntica al ejemplo anterior...
+        return layout;
+    }
 
-        // Use custom CSS classes to apply styling. This is defined in
-        // styles.css.
-        addClassName("centered-content");
+    private void refreshGeneral() {
+        // igual al ejemplo anterior...
+    }
 
-        add(textField, button);
+    private void openEditor(TurismoComunidad t, boolean isNew) {
+        // igual al ejemplo anterior...
+    }
+
+    private VerticalLayout buildAgrupadoLayout() {
+        VerticalLayout layout = new VerticalLayout(selectComunidad, gridAgrupado);
+        // igual al ejemplo anterior...
+        return layout;
+    }
+
+    private void refreshSelect() {
+        // igual al ejemplo anterior...
     }
 }
